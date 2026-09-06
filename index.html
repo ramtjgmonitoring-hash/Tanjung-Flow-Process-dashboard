@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrated PFD Tanjung Field</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand-mark">TF</div>
+      <div>
+        <div class="eyebrow">TANJUNG FIELD · INTEGRATED OPERATIONS</div>
+        <h1>Process & Equipment Dashboard</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="system-pill"><span class="status-dot"></span><span id="systemStatusText">System Standby</span></div>
+      <button id="toggleBtn" class="btn btn-primary">Power On System</button>
+    </div>
+  </header>
+
+  <main class="dashboard-shell">
+    <section class="overview-grid">
+      <article class="metric-card metric-blue">
+        <div class="metric-label">Total Gross Inlet</div>
+        <div class="metric-value"><span id="val-bfpd">0</span><small>BFPD</small></div>
+        <div class="metric-foot">Σ Block Station inlet</div>
+      </article>
+      <article class="metric-card metric-amber">
+        <div class="metric-label">Net Oil Transfer</div>
+        <div class="metric-value"><span id="val-bopd">0</span><small>BOPD</small></div>
+        <div class="metric-foot">Calculated from Water Cut</div>
+      </article>
+      <article class="metric-card metric-cyan">
+        <div class="metric-label">Injection Rate</div>
+        <div class="metric-value"><span id="val-inj">0</span><small>BWPD</small></div>
+        <div class="metric-foot">WTIP → WIP → Well</div>
+      </article>
+      <article class="metric-card metric-violet">
+        <div class="metric-label">Average Water Cut</div>
+        <div class="metric-value"><span id="val-wc-top">0</span><small>%</small></div>
+        <div class="metric-foot">Integration parameter</div>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="panel integration-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">OPERATING DATA LAYER</div>
+            <h2>Data Integrasi / Input Parameter</h2>
+            <p>Nilai operasi yang digunakan dashboard. Data ini dipisahkan dari master spesifikasi equipment.</p>
+          </div>
+          <div class="panel-actions">
+            <button id="resetIntegrationBtn" class="btn btn-secondary">Reset Default</button>
+            <button id="applyIntegrationBtn" class="btn btn-success">Apply Data</button>
+          </div>
+        </div>
+
+        <div class="integration-table-wrap">
+          <table class="integration-table">
+            <thead>
+              <tr>
+                <th>Area / Station</th>
+                <th>Parameter</th>
+                <th>Value</th>
+                <th>Unit</th>
+                <th>Source</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="integrationRows"></tbody>
+          </table>
+        </div>
+        <div class="integration-note"><strong>Catatan:</strong> nilai pada PFD bersifat read-only. Perubahan data operasi dilakukan dari tabel integrasi ini; spesifikasi pompa/tangki/separator dikelola dari halaman Equipment Database masing-masing station.</div>
+      </article>
+
+      <aside class="panel db-panel">
+        <div class="panel-heading compact">
+          <div>
+            <div class="eyebrow">MASTER DATA LAYER</div>
+            <h2>Equipment Database</h2>
+            <p>Akses spesifikasi teknis per area.</p>
+          </div>
+        </div>
+        <div id="equipmentLinks" class="equipment-link-list"></div>
+      </aside>
+    </section>
+
+    <section class="panel pfd-section">
+      <div class="panel-heading pfd-heading">
+        <div>
+          <div class="eyebrow">PROCESS VISUALIZATION</div>
+          <h2>Integrated Process Flow Diagram</h2>
+          <p>Visual aliran proses dengan parameter operasi dari Data Integrasi.</p>
+        </div>
+        <div class="legend"></div>
+      </div>
+
+      <div class="pfd-scroll">
+        <div class="pfd-board">
+          <svg class="pipe-network" width="1400" height="850" viewBox="0 0 1400 850" aria-label="Process flow network">
+            <defs>
+              <filter id="shadow"><feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.25"/></filter>
+            </defs>
+            <polyline points="70,440 780,440" class="pipe-bg red" filter="url(#shadow)"/><polyline points="70,440 780,440" class="pipe-fg red"/><polyline points="70,440 780,440" class="pipe-flow red-flow"/>
+            <polyline points="150,560 150,380 780,380" class="pipe-bg blue" filter="url(#shadow)"/><polyline points="150,560 150,380 780,380" class="pipe-fg blue"/><polyline points="150,560 150,380 780,380" class="pipe-flow blue-flow"/>
+            <polyline points="260,260 260,380" class="pipe-bg blue"/><polyline points="260,260 260,380" class="pipe-fg blue"/><polyline points="260,260 260,380" class="pipe-flow blue-flow"/>
+            <polyline points="380,560 380,380" class="pipe-bg blue"/><polyline points="380,560 380,380" class="pipe-fg blue"/><polyline points="380,560 380,380" class="pipe-flow blue-flow"/>
+            <polyline points="480,680 480,380" class="pipe-bg blue"/><polyline points="480,680 480,380" class="pipe-fg blue"/><polyline points="480,680 480,380" class="pipe-flow blue-flow"/>
+            <polyline points="580,560 580,380" class="pipe-bg blue"/><polyline points="580,560 580,380" class="pipe-fg blue"/><polyline points="580,560 580,380" class="pipe-flow blue-flow"/>
+            <polyline points="680,260 680,380" class="pipe-bg blue"/><polyline points="680,260 680,380" class="pipe-fg blue"/><polyline points="680,260 680,380" class="pipe-flow blue-flow"/>
+            <polyline points="820,380 820,240 820,100 680,100" class="pipe-bg cyan" filter="url(#shadow)"/><polyline points="820,380 820,240 820,100 680,100" class="pipe-fg cyan"/><polyline points="820,380 820,240 820,100 680,100" class="pipe-flow cyan-flow"/>
+            <polyline points="860,420 1280,420" class="pipe-bg brown" filter="url(#shadow)"/><polyline points="860,420 1280,420" class="pipe-fg brown"/><polyline points="860,420 1280,420" class="pipe-flow brown-flow"/>
+            <polyline points="1000,420 1000,380" class="pipe-bg brown"/><polyline points="1000,420 1000,380" class="pipe-fg brown"/>
+            <polyline points="1060,420 1060,380" class="pipe-bg brown"/><polyline points="1060,420 1060,380" class="pipe-fg brown"/>
+          </svg>
+
+          <div class="pipe-label" style="top:445px;left:160px;color:#fb7185">Red Line Trunk</div>
+          <div class="pipe-label" style="top:360px;left:270px">6&quot; (0.195 km)</div><div class="pipe-label" style="top:360px;left:310px">8&quot; (1.457 km)</div><div class="pipe-label" style="top:360px;left:410px">10&quot; (7.734 km)</div>
+          <div class="pipe-label" style="top:470px;left:390px">6&quot; (0.105 km)</div><div class="pipe-label" style="top:550px;left:490px">6&quot; (1.2 km)</div><div class="pipe-label" style="top:470px;left:590px">6&quot; (0.607 km)</div><div class="pipe-label" style="top:300px;left:690px">6&quot; (0.450 km)</div>
+
+          <div class="plant-group" style="top:130px;left:80px"><a class="station-3d cyan-theme" href="detail_wtp.html" target="_blank">WTP</a><div class="plant-meter"><span id="v-wtp">0</span> BWPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:410px;left:30px"><a class="station-3d" href="detail_bs_ws.html" target="_blank">BS.WS</a><div class="plant-meter">Inlet <span id="v-ws-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:560px;left:120px"><a class="station-3d" href="detail_bs_v.html" target="_blank">BS.V</a><div class="plant-meter">Inlet <span id="v-v-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:210px;left:230px"><a class="station-3d" href="detail_bs_iv.html" target="_blank">BS.IV</a><div class="plant-meter">Inlet <span id="v-iv-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:560px;left:350px"><a class="station-3d" href="detail_bs_iii.html" target="_blank">BS.III</a><div class="plant-meter">Inlet <span id="v-iii-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:680px;left:450px"><a class="station-3d" href="detail_bs_vi.html" target="_blank">BS.VI</a><div class="plant-meter">Inlet <span id="v-vi-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:560px;left:550px"><a class="station-3d" href="detail_bs_ii.html" target="_blank">BS.II</a><div class="plant-meter">Inlet <span id="v-ii-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:210px;left:650px"><a class="station-3d" href="detail_bs_i.html" target="_blank">BS.I</a><div class="plant-meter">Inlet <span id="v-i-input">0</span> BFPD</div><div class="data-tag">INTEGRATION</div></div>
+
+          <div class="plant-group" style="top:360px;left:750px"><a class="station-3d yellow-theme large-station" href="detail_spu.html" target="_blank">SPU MNGL</a><div class="plant-meter">Water Cut <span id="v-wc">0</span> %</div><div class="data-tag amber-tag">INTEGRATION</div></div>
+          <div class="plant-group" style="top:220px;left:770px"><a class="station-3d yellow-theme" href="detail_wtip.html" target="_blank">NEW WTIP</a><div class="plant-meter"><span id="v-wtip">0</span> BWPD</div><div class="data-tag">CALCULATED</div></div>
+          <div class="plant-group" style="top:80px;left:790px"><a class="station-3d yellow-theme" href="detail_wip.html" target="_blank">WIP</a><div class="plant-meter"><span id="v-wip">0</span> BWPD</div><div class="data-tag">CALCULATED</div></div>
+
+          <div class="injection-well" style="top:70px;left:620px"><span>↓</span></div><div class="well-label" style="top:48px;left:576px">Well Injection</div><div class="plant-meter static-meter" style="top:138px;left:588px"><span id="v-well-inj">0</span> BWPD</div>
+          <div class="small-label" style="top:310px;left:970px">Own Use SB.I & SB.II</div>
+          <div class="tank-3d tank-gray" style="top:330px;left:980px;width:40px;height:50px"><div class="lid"></div>T.103</div><div class="tank-3d tank-gray" style="top:330px;left:1040px;width:40px;height:50px"><div class="lid"></div>T.203</div>
+          <div class="tank-3d tank-gray" style="top:370px;left:1150px;width:50px;height:60px"><div class="lid"></div>DHP<br>FWKO</div><div class="tank-3d tank-blue" style="top:370px;left:1250px;width:60px;height:60px"><div class="lid"></div>Tangki R<br>RU V</div>
+          <div class="pipe-label" style="top:430px;left:870px;color:#f59e0b">Suspensi (crude 65%, water 35%)</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">Tanjung Field Integrated Dashboard · Operating data and equipment master data are managed as separate layers.</footer>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>

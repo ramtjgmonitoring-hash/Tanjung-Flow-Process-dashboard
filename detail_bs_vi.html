@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block Station VI - Equipment Database</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="equipment.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div><div class="eyebrow">MASTER DATA · EQUIPMENT SPECIFICATION</div><h1 id="pageTitle">Block Station VI</h1><p class="subtext">Database spesifikasi equipment. Nilai operasi / input parameter dikelola terpisah pada Data Integrasi di dashboard utama.</p></div>
+      <div class="top-actions"><button class="btn btn-secondary" onclick="resetDb()">Reset Sample</button><a class="btn btn-primary" href="index.html">← Dashboard</a></div>
+    </header>
+    <div class="info-strip"><strong>Data separation:</strong> halaman ini hanya untuk master spesifikasi equipment dan status equipment. Data flow, water cut, dan injection rate tidak diedit dari halaman ini.</div>
+    <section class="summary-grid">
+      <article class="summary-card"><span>Area Code</span><strong id="areaCode">BS.VI</strong><small>Equipment master scope</small></article>
+      <article class="summary-card"><span>Total Pumps</span><strong id="pumpCount">0</strong><small>Registered assets</small></article>
+      <article class="summary-card"><span>Tank / Vessel</span><strong id="vesselCount">0</strong><small>Registered assets</small></article>
+      <article class="summary-card"><span>Running / Standby</span><strong><span id="runningCount">0</span> / <span id="standbyCount">0</span></strong><small>Current equipment status</small></article>
+    </section>
+    <section class="section-card"><div class="section-head"><div><h2>Pump Specifications</h2><p>Master design, hydraulic, motor, material, dan equipment status.</p></div><button class="btn btn-primary" onclick="openModal('pumps')">+ Add Pump</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Tag ID</th><th>Type</th><th>Model / Service</th><th>Design Capacity</th><th>Rated Head</th><th>Motor Power</th><th>Material</th><th>Status</th><th>Action</th></tr></thead><tbody id="pumpBody"></tbody></table></div></section>
+    <section class="section-card"><div class="section-head"><div><h2>Tank / Vessel Specifications</h2><p>Master kapasitas, pressure rating, operating limit, current level, dan status.</p></div><button class="btn btn-primary" onclick="openModal('vessels')">+ Add Tank / Vessel</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Tag ID</th><th>Type</th><th>Model / Service</th><th>Design Capacity</th><th>Design Pressure</th><th>Operating Limit</th><th>Current Level</th><th>Status</th><th>Action</th></tr></thead><tbody id="vesselBody"></tbody></table></div></section>
+    <div class="footer">Block Station VI · Equipment Specification Database</div>
+  </main>
+  <div id="crudModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Add Equipment</h3></div><div class="modal-body"><div class="form-grid">
+    <div class="form-group"><label>Tag ID</label><input id="f-tag" placeholder="P-101A / V-201"></div><div class="form-group"><label>Status</label><select id="f-status"><option>RUNNING</option><option>STANDBY</option><option>REPAIR</option></select></div>
+    <div class="form-group"><label>Type</label><input id="f-type" placeholder="Centrifugal / Separator"></div><div class="form-group"><label>Model / Service</label><input id="f-model" placeholder="Service / model"></div>
+    <div class="form-group"><label>Design Capacity</label><input id="f-design" placeholder="10,000 BPD / 2,000 BBL"></div><div class="form-group"><label id="fieldHeadLabel">Rated Head</label><input id="f-head" placeholder="145 m / 150 psig"></div>
+    <div class="form-group"><label id="fieldPowerLabel">Motor Power</label><input id="f-power" placeholder="110 kW / 75%"></div><div class="form-group"><label id="fieldMaterialLabel">Material</label><input id="f-material" placeholder="CS / SS316 / 65%"></div>
+  </div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitForm()">Save Data</button></div></div></div></div>
+  <script>window.EQUIPMENT_PAGE={code:'BS.VI',name:'Block Station VI',prefix:'BSVI'};</script><script src="equipment.js"></script>
+</body></html>

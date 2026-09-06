@@ -56,7 +56,7 @@
     document.getElementById('runningCount').textContent = running;
     document.getElementById('standbyCount').textContent = standby;
 
-    // Render Tabel Pompa (Catatan di SEBELAH KIRI Action)
+    // Render Tabel Pompa (Kolom Catatan di kiri, Action di kanan berisi tombol Edit/Del secara vertikal)
     const pumpBody = document.getElementById('pumpBody');
     pumpBody.innerHTML = pumps.map((p, idx) => `
       <tr>
@@ -70,13 +70,13 @@
         <td><span class="status-chip status-${p.status.toLowerCase()}">${p.status}</span></td>
         <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${p.note || ''}</textarea></td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px;" onclick="editItem('pumps', ${idx})">Edit</button><br>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171;" onclick="deleteItem('pumps', ${idx})">Del</button>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('pumps', ${idx})">Edit</button><br>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('pumps', ${idx})">Del</button>
         </td>
       </tr>
     `).join('');
 
-    // Render Tabel Vessel (Catatan di SEBELAH KIRI Action)
+    // Render Tabel Vessel (Kolom Catatan di kiri, Action di kanan berisi tombol Edit/Del secara vertikal)
     const vesselBody = document.getElementById('vesselBody');
     vesselBody.innerHTML = vessels.map((v, idx) => `
       <tr>
@@ -90,8 +90,8 @@
         <td><span class="status-chip status-${v.status.toLowerCase()}">${v.status}</span></td>
         <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${v.note || ''}</textarea></td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px;" onclick="editItem('vessels', ${idx})">Edit</button><br>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171;" onclick="deleteItem('vessels', ${idx})">Del</button>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('vessels', ${idx})">Edit</button><br>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('vessels', ${idx})">Del</button>
         </td>
       </tr>
     `).join('');
@@ -121,7 +121,7 @@
       document.getElementById('f-head').value = category === 'pumps' ? item.head : item.pressure;
       document.getElementById('f-power').value = category === 'pumps' ? item.power : item.limit;
       document.getElementById('f-material').value = category === 'pumps' ? item.material : item.level;
-      document.getElementById('f-note').value = item.note || '';
+      if(document.getElementById('f-note')) document.getElementById('f-note').value = item.note || '';
     } else {
       document.getElementById('f-tag').value = '';
       document.getElementById('f-status').value = 'RUNNING';
@@ -131,7 +131,7 @@
       document.getElementById('f-head').value = '';
       document.getElementById('f-power').value = '';
       document.getElementById('f-material').value = '';
-      document.getElementById('f-note').value = '';
+      if(document.getElementById('f-note')) document.getElementById('f-note').value = '';
     }
   };
 
@@ -163,12 +163,12 @@
       type: document.getElementById('f-type').value,
       model: document.getElementById('f-model').value,
       design: document.getElementById('f-design').value,
-      note: document.getElementById('f-note').value
+      note: document.getElementById('f-note') ? document.getElementById('f-note').value : ''
     };
 
     if (currentCategory === 'pumps') {
       item.head = document.getElementById('f-head').value;
-      item.power = document.getElementById('f-power'].value || document.getElementById('f-power').value;
+      item.power = document.getElementById('f-power').value;
       item.material = document.getElementById('f-material').value;
     } else {
       item.pressure = document.getElementById('f-head').value;

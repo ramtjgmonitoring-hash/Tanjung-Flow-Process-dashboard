@@ -20,7 +20,7 @@
   function loadDb() {
     try {
       const data = JSON.parse(localStorage.getItem(storageKey));
-      return data ? data : defaultDb();
+      return (data && data.pumps && data.vessels) ? data : defaultDb();
     } catch(e) {
       return defaultDb();
     }
@@ -39,67 +39,80 @@
   };
 
   function render() {
-    document.getElementById('pageTitle').textContent = page.name;
-    document.getElementById('areaCode').textContent = page.code;
+    const titleEl = document.getElementById('pageTitle');
+    const areaEl = document.getElementById('areaCode');
+    if(titleEl) titleEl.textContent = page.name;
+    if(areaEl) areaEl.textContent = page.code;
 
     const pumps = db.pumps || [];
     const vessels = db.vessels || [];
 
-    document.getElementById('pumpCount').textContent = pumps.length;
-    document.getElementById('vesselCount').textContent = vessels.length;
+    const pCount = document.getElementById('pumpCount');
+    const vCount = document.getElementById('vesselCount');
+    if(pCount) pCount.textContent = pumps.length;
+    if(vCount) vCount.textContent = vessels.length;
 
     let running = 0, standby = 0;
     [...pumps, ...vessels].forEach(item => {
       if(item.status === 'RUNNING') running++;
       if(item.status === 'STANDBY') standby++;
     });
-    document.getElementById('runningCount').textContent = running;
-    document.getElementById('standbyCount').textContent = standby;
+    
+    const rCount = document.getElementById('runningCount');
+    const sCount = document.getElementById('standbyCount');
+    if(rCount) rCount.textContent = running;
+    if(sCount) sCount.textContent = standby;
 
-    // Render Tabel Pompa (Kolom Catatan di kiri, Action di kanan berisi tombol Edit/Del secara vertikal)
+    // Render Tabel Pompa (Catatan di kiri, Action tombol Edit/Del di kanan)
     const pumpBody = document.getElementById('pumpBody');
-    pumpBody.innerHTML = pumps.map((p, idx) => `
-      <tr>
-        <td><b>${p.tag}</b></td>
-        <td>${p.type}</td>
-        <td>${p.model}</td>
-        <td>${p.design}</td>
-        <td>${p.head}</td>
-        <td>${p.power}</td>
-        <td>${p.material}</td>
-        <td><span class="status-chip status-${p.status.toLowerCase()}">${p.status}</span></td>
-        <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${p.note || ''}</textarea></td>
-        <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('pumps', ${idx})">Edit</button><br>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('pumps', ${idx})">Del</button>
-        </td>
-      </tr>
-    `).join('');
+    if(pumpBody) {
+      pumpBody.innerHTML = pumps.map((p, idx) => `
+        <tr>
+          <td><b>${p.tag}</b></td>
+          <td>${p.type}</td>
+          <td>${p.model}</td>
+          <td>${p.design}</td>
+          <td>${p.head}</td>
+          <td>${p.power}</td>
+          <td>${p.material}</td>
+          <td><span class="status-chip status-${(p.status || 'RUNNING').toLowerCase()}">${p.status}</span></td>
+          <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${p.note || ''}</textarea></td>
+          <td>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('pumps', ${idx})">Edit</button><br>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('pumps', ${idx})">Del</button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-    // Render Tabel Vessel (Kolom Catatan di kiri, Action di kanan berisi tombol Edit/Del secara vertikal)
+    // Render Tabel Vessel (Catatan di kiri, Action tombol Edit/Del di kanan)
     const vesselBody = document.getElementById('vesselBody');
-    vesselBody.innerHTML = vessels.map((v, idx) => `
-      <tr>
-        <td><b>${v.tag}</b></td>
-        <td>${v.type}</td>
-        <td>${v.model}</td>
-        <td>${v.design}</td>
-        <td>${v.pressure}</td>
-        <td>${v.limit}</td>
-        <td>${v.level}</td>
-        <td><span class="status-chip status-${v.status.toLowerCase()}">${v.status}</span></td>
-        <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${v.note || ''}</textarea></td>
-        <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('vessels', ${idx})">Edit</button><br>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('vessels', ${idx})">Del</button>
-        </td>
-      </tr>
-    `).join('');
+    if(vesselBody) {
+      vesselBody.innerHTML = vessels.map((v, idx) => `
+        <tr>
+          <td><b>${v.tag}</b></td>
+          <td>${v.type}</td>
+          <td>${v.model}</td>
+          <td>${v.design}</td>
+          <td>${v.pressure}</td>
+          <td>${v.limit}</td>
+          <td>${v.level}</td>
+          <td><span class="status-chip status-${(v.status || 'RUNNING').toLowerCase()}">${v.status}</span></td>
+          <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${v.note || ''}</textarea></td>
+          <td>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('vessels', ${idx})">Edit</button><br>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('vessels', ${idx})">Del</button>
+          </td>
+        </tr>
+      `).join('');
+    }
   }
 
   window.updateNote = function(type, index, val) {
-    db[type][index].note = val;
-    localStorage.setItem(storageKey, JSON.stringify(db));
+    if(db[type] && db[type][index]) {
+      db[type][index].note = val;
+      localStorage.setItem(storageKey, JSON.stringify(db));
+    }
   };
 
   let currentCategory = 'pumps';
@@ -108,35 +121,49 @@
   window.openModal = function(category, idx = -1) {
     currentCategory = category;
     editIndex = idx;
-    document.getElementById('crudModal').style.display = 'flex';
-    document.getElementById('modalTitle').textContent = (idx >= 0 ? 'Edit ' : 'Add ') + (category === 'pumps' ? 'Pump' : 'Tank / Vessel');
+    const modal = document.getElementById('crudModal');
+    if(modal) modal.style.display = 'flex';
+    
+    const titleEl = document.getElementById('modalTitle');
+    if(titleEl) titleEl.textContent = (idx >= 0 ? 'Edit ' : 'Add ') + (category === 'pumps' ? 'Pump' : 'Tank / Vessel');
 
-    if (idx >= 0) {
+    const fTag = document.getElementById('f-tag');
+    const fStatus = document.getElementById('f-status');
+    const fType = document.getElementById('f-type');
+    const fModel = document.getElementById('f-model');
+    const fDesign = document.getElementById('f-design');
+    const fHead = document.getElementById('f-head');
+    const fPower = document.getElementById('f-power');
+    const fMaterial = document.getElementById('f-material');
+    const fNote = document.getElementById('f-note');
+
+    if (idx >= 0 && db[category][idx]) {
       const item = db[category][idx];
-      document.getElementById('f-tag').value = item.tag || '';
-      document.getElementById('f-status').value = item.status || 'RUNNING';
-      document.getElementById('f-type').value = item.type || '';
-      document.getElementById('f-model').value = item.model || '';
-      document.getElementById('f-design').value = item.design || '';
-      document.getElementById('f-head').value = category === 'pumps' ? item.head : item.pressure;
-      document.getElementById('f-power').value = category === 'pumps' ? item.power : item.limit;
-      document.getElementById('f-material').value = category === 'pumps' ? item.material : item.level;
-      if(document.getElementById('f-note')) document.getElementById('f-note').value = item.note || '';
+      if(fTag) fTag.value = item.tag || '';
+      if(fStatus) fStatus.value = item.status || 'RUNNING';
+      if(fType) fType.value = item.type || '';
+      if(fModel) fModel.value = item.model || '';
+      if(fDesign) fDesign.value = item.design || '';
+      if(fHead) fHead.value = category === 'pumps' ? (item.head || '') : (item.pressure || '');
+      if(fPower) fPower.value = category === 'pumps' ? (item.power || '') : (item.limit || '');
+      if(fMaterial) fMaterial.value = category === 'pumps' ? (item.material || '') : (item.level || '');
+      if(fNote) fNote.value = item.note || '';
     } else {
-      document.getElementById('f-tag').value = '';
-      document.getElementById('f-status').value = 'RUNNING';
-      document.getElementById('f-type').value = '';
-      document.getElementById('f-model').value = '';
-      document.getElementById('f-design').value = '';
-      document.getElementById('f-head').value = '';
-      document.getElementById('f-power').value = '';
-      document.getElementById('f-material').value = '';
-      if(document.getElementById('f-note')) document.getElementById('f-note').value = '';
+      if(fTag) fTag.value = '';
+      if(fStatus) fStatus.value = 'RUNNING';
+      if(fType) fType.value = '';
+      if(fModel) fModel.value = '';
+      if(fDesign) fDesign.value = '';
+      if(fHead) fHead.value = '';
+      if(fPower) fPower.value = '';
+      if(fMaterial) fMaterial.value = '';
+      if(fNote) fNote.value = '';
     }
   };
 
   window.closeModal = function() {
-    document.getElementById('crudModal').style.display = 'none';
+    const modal = document.getElementById('crudModal');
+    if(modal) modal.style.display = 'none';
   };
 
   window.editItem = function(category, idx) {
@@ -151,7 +178,8 @@
   };
 
   window.submitForm = function() {
-    const tag = document.getElementById('f-tag').value.trim();
+    const fTag = document.getElementById('f-tag');
+    const tag = fTag ? fTag.value.trim() : '';
     if(!tag) {
       alert('Tag ID wajib diisi!');
       return;
@@ -159,26 +187,31 @@
 
     const item = {
       tag: tag,
-      status: document.getElementById('f-status').value,
-      type: document.getElementById('f-type').value,
-      model: document.getElementById('f-model').value,
-      design: document.getElementById('f-design').value,
+      status: document.getElementById('f-status') ? document.getElementById('f-status').value : 'RUNNING',
+      type: document.getElementById('f-type') ? document.getElementById('f-type').value : '',
+      model: document.getElementById('f-model') ? document.getElementById('f-model').value : '',
+      design: document.getElementById('f-design') ? document.getElementById('f-design').value : '',
       note: document.getElementById('f-note') ? document.getElementById('f-note').value : ''
     };
 
+    const hVal = document.getElementById('f-head') ? document.getElementById('f-head').value : '';
+    const pVal = document.getElementById('f-power') ? document.getElementById('f-power').value : '';
+    const mVal = document.getElementById('f-material') ? document.getElementById('f-material').value : '';
+
     if (currentCategory === 'pumps') {
-      item.head = document.getElementById('f-head').value;
-      item.power = document.getElementById('f-power').value;
-      item.material = document.getElementById('f-material').value;
+      item.head = hVal;
+      item.power = pVal;
+      item.material = mVal;
     } else {
-      item.pressure = document.getElementById('f-head').value;
-      item.limit = document.getElementById('f-power').value;
-      item.level = document.getElementById('f-material').value;
+      item.pressure = hVal;
+      item.limit = pVal;
+      item.level = mVal;
     }
 
     if (editIndex >= 0) {
       db[currentCategory][editIndex] = item;
     } else {
+      if(!db[currentCategory]) db[currentCategory] = [];
       db[currentCategory].push(item);
     }
 

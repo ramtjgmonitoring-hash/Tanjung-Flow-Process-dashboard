@@ -13,19 +13,20 @@
       <div class="top-actions"><button class="btn btn-secondary" onclick="resetDb()">Reset Sample</button><a class="btn btn-primary" href="index.html">← Dashboard</a></div>
     </header>
 
-    <!-- PANEL DOKUMEN REFERENSI (GOOGLE DRIVE / P&ID) -->
+    <!-- PANEL MULTIPLE DOKUMEN REFERENSI -->
     <section class="section-card" style="margin-bottom: 20px; background: rgba(13, 26, 43, 0.95); border: 1px solid #22344e; padding: 18px; border-radius: 14px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <div class="eyebrow" style="color: #67e8f9;">DOCUMENT INTEGRATION</div>
-          <h3 style="margin: 3px 0 0; font-size: 16px; color: #fff;">Link Dokumen Referensi (P&ID / PFD / Google Drive)</h3>
-        </div>
-        <div style="display:flex; gap:8px; flex:1; max-width:600px; min-width:280px;">
-          <input type="url" id="docLinkInput" class="value-input" placeholder="Tempel link Google Drive / P&ID di sini..." style="flex:1; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
-          <button class="btn btn-primary" onclick="saveStationDoc()" style="white-space:nowrap;">Simpan Link</button>
-          <a id="openDocBtn" href="#" target="_blank" class="btn btn-success" style="display:none; text-decoration:none; white-space:nowrap;">Buka Dokumen</a>
-        </div>
+      <div style="margin-bottom: 12px;">
+        <div class="eyebrow" style="color: #67e8f9;">DOCUMENT INTEGRATION MANAGER</div>
+        <h3 style="margin: 3px 0 0; font-size: 16px; color: #fff;">Daftar Dokumen Referensi (P&ID / PFD / Google Drive)</h3>
       </div>
+      
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 14px;">
+        <input type="text" id="docNameInput" class="value-input" placeholder="Nama Dokumen (Contoh: P&ID Separator BS.VI)..." style="flex: 1; min-width: 200px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
+        <input type="url" id="docUrlInput" class="value-input" placeholder="Tempel URL Link (Google Drive / PDF)..." style="flex: 2; min-width: 250px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
+        <button class="btn btn-primary" onclick="addStationDoc()" style="white-space:nowrap;">+ Tambah Link</button>
+      </div>
+
+      <div id="docListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;"></div>
     </section>
 
     <div class="info-strip"><strong>Data separation:</strong> halaman ini untuk master spesifikasi equipment, catatan operasional, dan link dokumen referensi stasiun.</div>
@@ -55,8 +56,8 @@
               <th>Motor Power</th>
               <th>Material</th>
               <th>Status</th>
-              <th>Action</th>
               <th>Catatan / Keterangan</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="pumpBody"></tbody>
@@ -82,8 +83,8 @@
               <th>Operating Limit</th>
               <th>Current Level</th>
               <th>Status</th>
-              <th>Action</th>
               <th>Catatan / Keterangan</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="vesselBody"></tbody>
@@ -94,53 +95,313 @@
     <div class="footer">Block Station VI · Equipment Specification Database</div>
   </main>
 
-  <div id="crudModal" class="modal">
-    <div class="modal-card">
-      <div class="modal-head"><h3 id="modalTitle">Add Equipment</h3></div>
+  <div id="crudModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:center; justify-content:center;">
+    <div class="modal-card" style="background:#0d1a2b; border:1px solid #22344e; padding:24px; border-radius:16px; width:100%; max-width:600px;">
+      <div class="modal-head" style="margin-bottom:16px;"><h3 id="modalTitle" style="margin:0; font-size:18px; color:#fff;">Add Equipment</h3></div>
       <div class="modal-body">
-        <div class="form-grid">
-          <div class="form-group"><label>Tag ID</label><input id="f-tag" placeholder="P-101A / V-201"></div>
-          <div class="form-group"><label>Status</label><select id="f-status"><option>RUNNING</option><option>STANDBY</option><option>REPAIR</option></select></div>
-          <div class="form-group"><label>Type</label><input id="f-type" placeholder="Centrifugal / Separator"></div>
-          <div class="form-group"><label>Model / Service</label><input id="f-model" placeholder="Service / model"></div>
-          <div class="form-group"><label>Design Capacity</label><input id="f-design" placeholder="10,000 BPD / 2,000 BBL"></div>
-          <div class="form-group"><label id="fieldHeadLabel">Rated Head</label><input id="f-head" placeholder="145 m / 150 psig"></div>
-          <div class="form-group"><label id="fieldPowerLabel">Motor Power</label><input id="f-power" placeholder="110 kW / 75%"></div>
-          <div class="form-group"><label id="fieldMaterialLabel">Material</label><input id="f-material" placeholder="CS / SS316 / 65%"></div>
-          <div class="form-group" style="grid-column: span 2;"><label>Catatan / Keterangan</label><input id="f-note" placeholder="Catatan khusus equipment..."></div>
+        <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Tag ID</label><input id="f-tag" class="value-input" placeholder="P-101A / V-201" style="width:100%;"></div>
+          <div class="form-group"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Status</label><select id="f-status" class="value-input" style="width:100%;"><option>RUNNING</option><option>STANDBY</option><option>REPAIR</option></select></div>
+          <div class="form-group"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Type</label><input id="f-type" class="value-input" placeholder="Centrifugal / Separator" style="width:100%;"></div>
+          <div class="form-group"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Model / Service</label><input id="f-model" class="value-input" placeholder="Service / model" style="width:100%;"></div>
+          <div class="form-group"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Design Capacity</label><input id="f-design" class="value-input" placeholder="10,000 BPD / 2,000 BBL" style="width:100%;"></div>
+          <div class="form-group"><label id="fieldHeadLabel" style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Rated Head</label><input id="f-head" class="value-input" placeholder="145 m / 150 psig" style="width:100%;"></div>
+          <div class="form-group"><label id="fieldPowerLabel" style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Motor Power</label><input id="f-power" class="value-input" placeholder="110 kW / 75%" style="width:100%;"></div>
+          <div class="form-group"><label id="fieldMaterialLabel" style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Material</label><input id="f-material" class="value-input" placeholder="CS / SS316 / 65%" style="width:100%;"></div>
+          <div class="form-group" style="grid-column: span 2;"><label style="font-size:11px; color:#8fa3bf; display:block; margin-bottom:4px;">Catatan / Keterangan</label><textarea id="f-note" placeholder="Catatan khusus equipment..." style="width:100%; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px; border-radius:8px; font-family:inherit; min-height:70px; resize:vertical;"></textarea></div>
         </div>
-        <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitForm()">Save Data</button></div>
+        <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitForm()">Save Data</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    window.EQUIPMENT_PAGE={code:'BS.VI',name:'Block Station VI',prefix:'BSVI'};
-    
-    const docKey = 'tanjung_doc_bs_vi';
-    function loadStationDoc() {
-      const saved = localStorage.getItem(docKey);
-      if(saved) {
-        document.getElementById('docLinkInput').value = saved;
-        const btnOpen = document.getElementById('openDocBtn');
-        btnOpen.href = saved;
-        btnOpen.style.display = 'inline-block';
+    window.EQUIPMENT_PAGE = { code: 'BS.VI', name: 'Block Station VI', prefix: 'BSVI' };
+    const page = window.EQUIPMENT_PAGE;
+    const storageKey = 'tanjung_equip_' + page.code.toLowerCase().replace('.', '_');
+    const docStorageKey = 'tanjung_docs_bs_vi';
+
+    let db = loadDb();
+
+    function defaultDb() {
+      return {
+        pumps: [
+          { tag: page.prefix + '-101A', type: 'Centrifugal', model: 'Process Duty', design: '10,000 BPD', head: '145 m', power: '110 kW', material: 'CS / SS316', status: 'RUNNING', note: 'Primary duty pump' },
+          { tag: page.prefix + '-101B', type: 'Centrifugal', model: 'Standby Duty', design: '10,000 BPD', head: '145 m', power: '110 kW', material: 'CS / SS316', status: 'STANDBY', note: 'Standby ready' }
+        ],
+        vessels: [
+          { tag: 'V-' + page.prefix + '-01', type: 'Separator / Vessel', model: 'Horizontal 3-Phase', design: '2,000 BBL', pressure: '150 psig', limit: '75%', level: '65%', status: 'RUNNING', note: 'Main separator' },
+          { tag: 'T-' + page.prefix + '-01', type: 'Storage Tank', model: 'Atmospheric', design: '10,000 BBL', pressure: 'ATM', limit: '80%', level: '45%', status: 'RUNNING', note: 'Buffer tank' }
+        ]
+      };
+    }
+
+    function loadDb() {
+      try {
+        const data = JSON.parse(localStorage.getItem(storageKey));
+        return (data && data.pumps && data.vessels) ? data : defaultDb();
+      } catch(e) {
+        return defaultDb();
       }
     }
-    function saveStationDoc() {
-      const val = document.getElementById('docLinkInput').value.trim();
-      if(val) {
-        localStorage.setItem(docKey, val);
-        loadStationDoc();
-        alert('Link dokumen referensi berhasil disimpan!');
+
+    function saveDb() {
+      localStorage.setItem(storageKey, JSON.stringify(db));
+      render();
+    }
+
+    window.resetDb = function() {
+      if(confirm('Kembalikan data spesifikasi ke awal?')) {
+        db = defaultDb();
+        saveDb();
+      }
+    };
+
+    function render() {
+      document.getElementById('pageTitle').textContent = page.name;
+      document.getElementById('areaCode').textContent = page.code;
+
+      const pumps = db.pumps || [];
+      const vessels = db.vessels || [];
+
+      document.getElementById('pumpCount').textContent = pumps.length;
+      document.getElementById('vesselCount').textContent = vessels.length;
+
+      let running = 0, standby = 0;
+      [...pumps, ...vessels].forEach(item => {
+        if(item.status === 'RUNNING') running++;
+        if(item.status === 'STANDBY') standby++;
+      });
+      document.getElementById('runningCount').textContent = running;
+      document.getElementById('standbyCount').textContent = standby;
+
+      // Render Pompa: Catatan di Kiri, Action di Kanan
+      const pumpBody = document.getElementById('pumpBody');
+      if(pumpBody) {
+        pumpBody.innerHTML = pumps.map((p, idx) => `
+          <tr>
+            <td><b>${p.tag}</b></td>
+            <td>${p.type}</td>
+            <td>${p.model}</td>
+            <td>${p.design}</td>
+            <td>${p.head}</td>
+            <td>${p.power}</td>
+            <td>${p.material}</td>
+            <td><span class="status-chip status-${(p.status || 'RUNNING').toLowerCase()}">${p.status}</span></td>
+            <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${p.note || ''}</textarea></td>
+            <td>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('pumps', ${idx})">Edit</button><br>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('pumps', ${idx})">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Render Vessel: Catatan di Kiri, Action di Kanan
+      const vesselBody = document.getElementById('vesselBody');
+      if(vesselBody) {
+        vesselBody.innerHTML = vessels.map((v, idx) => `
+          <tr>
+            <td><b>${v.tag}</b></td>
+            <td>${v.type}</td>
+            <td>${v.model}</td>
+            <td>${v.design}</td>
+            <td>${v.pressure}</td>
+            <td>${v.limit}</td>
+            <td>${v.level}</td>
+            <td><span class="status-chip status-${(v.status || 'RUNNING').toLowerCase()}">${v.status}</span></td>
+            <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${v.note || ''}</textarea></td>
+            <td>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px; display:inline-block;" onclick="editItem('vessels', ${idx})">Edit</button><br>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171; display:inline-block;" onclick="deleteItem('vessels', ${idx})">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    window.updateNote = function(type, index, val) {
+      if(db[type] && db[type][index]) {
+        db[type][index].note = val;
+        localStorage.setItem(storageKey, JSON.stringify(db));
+      }
+    };
+
+    let currentCategory = 'pumps';
+    let editIndex = -1;
+
+    window.openModal = function(category, idx = -1) {
+      currentCategory = category;
+      editIndex = idx;
+      const modal = document.getElementById('crudModal');
+      if(modal) modal.style.display = 'flex';
+      
+      const titleEl = document.getElementById('modalTitle');
+      if(titleEl) titleEl.textContent = (idx >= 0 ? 'Edit ' : 'Add ') + (category === 'pumps' ? 'Pump' : 'Tank / Vessel');
+
+      const fTag = document.getElementById('f-tag');
+      const fStatus = document.getElementById('f-status');
+      const fType = document.getElementById('f-type');
+      const fModel = document.getElementById('f-model');
+      const fDesign = document.getElementById('f-design');
+      const fHead = document.getElementById('f-head');
+      const fPower = document.getElementById('f-power');
+      const fMaterial = document.getElementById('f-material');
+      const fNote = document.getElementById('f-note');
+
+      if (idx >= 0 && db[category][idx]) {
+        const item = db[category][idx];
+        if(fTag) fTag.value = item.tag || '';
+        if(fStatus) fStatus.value = item.status || 'RUNNING';
+        if(fType) fType.value = item.type || '';
+        if(fModel) fModel.value = item.model || '';
+        if(fDesign) fDesign.value = item.design || '';
+        if(fHead) fHead.value = category === 'pumps' ? (item.head || '') : (item.pressure || '');
+        if(fPower) fPower.value = category === 'pumps' ? (item.power || '') : (item.limit || '');
+        if(fMaterial) fMaterial.value = category === 'pumps' ? (item.material || '') : (item.level || '');
+        if(fNote) fNote.value = item.note || '';
       } else {
-        localStorage.removeItem(docKey);
-        document.getElementById('openDocBtn').style.display = 'none';
-        alert('Link dikosongkan.');
+        if(fTag) fTag.value = '';
+        if(fStatus) fStatus.value = 'RUNNING';
+        if(fType) fType.value = '';
+        if(fModel) fModel.value = '';
+        if(fDesign) fDesign.value = '';
+        if(fHead) fHead.value = '';
+        if(fPower) fPower.value = '';
+        if(fMaterial) fMaterial.value = '';
+        if(fNote) fNote.value = '';
+      }
+    };
+
+    window.closeModal = function() {
+      const modal = document.getElementById('crudModal');
+      if(modal) modal.style.display = 'none';
+    };
+
+    window.editItem = function(category, idx) {
+      openModal(category, idx);
+    };
+
+    window.deleteItem = function(category, idx) {
+      if(confirm('Hapus item equipment ini?')) {
+        db[category].splice(idx, 1);
+        saveDb();
+      }
+    };
+
+    window.submitForm = function() {
+      const fTag = document.getElementById('f-tag');
+      const tag = fTag ? fTag.value.trim() : '';
+      if(!tag) {
+        alert('Tag ID wajib diisi!');
+        return;
+      }
+
+      const item = {
+        tag: tag,
+        status: document.getElementById('f-status') ? document.getElementById('f-status').value : 'RUNNING',
+        type: document.getElementById('f-type') ? document.getElementById('f-type').value : '',
+        model: document.getElementById('f-model') ? document.getElementById('f-model').value : '',
+        design: document.getElementById('f-design') ? document.getElementById('f-design').value : '',
+        note: document.getElementById('f-note') ? document.getElementById('f-note').value : ''
+      };
+
+      const hVal = document.getElementById('f-head') ? document.getElementById('f-head').value : '';
+      const pVal = document.getElementById('f-power') ? document.getElementById('f-power').value : '';
+      const mVal = document.getElementById('f-material') ? document.getElementById('f-material').value : '';
+
+      if (currentCategory === 'pumps') {
+        item.head = hVal;
+        item.power = pVal;
+        item.material = mVal;
+      } else {
+        item.pressure = hVal;
+        item.limit = pVal;
+        item.level = mVal;
+      }
+
+      if (editIndex >= 0) {
+        db[currentCategory][editIndex] = item;
+      } else {
+        if(!db[currentCategory]) db[currentCategory] = [];
+        db[currentCategory].push(item);
+      }
+
+      saveDb();
+      closeModal();
+    };
+
+    // --- MANAJEMEN MULTI-LINK DOKUMEN ---
+    function getSavedDocs() {
+      try {
+        return JSON.parse(localStorage.getItem(docStorageKey)) || [];
+      } catch(e) {
+        return [];
       }
     }
-    window.addEventListener('DOMContentLoaded', loadStationDoc);
+
+    function renderDocList() {
+      const docs = getSavedDocs();
+      const container = document.getElementById('docListContainer');
+      if(!container) return;
+
+      if(docs.length === 0) {
+        container.innerHTML = '<div style="color: #8fa3bf; font-size: 12px; font-style: italic; padding: 6px 0;">Belum ada dokumen referensi yang ditambahkan.</div>';
+        return;
+      }
+
+      container.innerHTML = docs.map((doc, index) => `
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #091626; border: 1px solid #21344e; padding: 8px 12px; border-radius: 8px; gap: 10px;">
+          <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+            <strong style="color: #67e8f9; font-size: 12px; display: block; margin-bottom: 2px;">${doc.name}</strong>
+            <a href="${doc.url}" target="_blank" style="color: #93c5fd; font-size: 11px; text-decoration: none; font-family: 'Roboto Mono', monospace;">${doc.url}</a>
+          </div>
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
+            <a href="${doc.url}" target="_blank" class="btn btn-success" style="padding: 4px 10px; font-size: 10px; text-decoration: none;">Buka</a>
+            <button class="btn btn-secondary" onclick="deleteDoc(${index})" style="padding: 4px 10px; font-size: 10px; background: #7f1d1d; border-color: #991b1b; color: #f87171;">Hapus</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.addStationDoc = function() {
+      const nameInput = document.getElementById('docNameInput');
+      const urlInput = document.getElementById('docUrlInput');
+      
+      const name = nameInput.value.trim();
+      const url = urlInput.value.trim();
+
+      if(!name || !url) {
+        alert('Mohon isi Nama Dokumen dan URL Link terlebih dahulu!');
+        return;
+      }
+
+      const docs = getSavedDocs();
+      docs.push({ name, url });
+      localStorage.setItem(docStorageKey, JSON.stringify(docs));
+
+      nameInput.value = '';
+      urlInput.value = '';
+      renderDocList();
+      alert('Dokumen referensi berhasil ditambahkan!');
+    };
+
+    window.deleteDoc = function(index) {
+      if(confirm('Apakah Anda yakin ingin menghapus link dokumen ini?')) {
+        const docs = getSavedDocs();
+        docs.splice(index, 1);
+        localStorage.setItem(docStorageKey, JSON.stringify(docs));
+        renderDocList();
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      render();
+      renderDocList();
+    });
   </script>
-  <script src="equipment.js"></script>
 </body>
 </html>

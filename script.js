@@ -1,4 +1,4 @@
-const STORAGE_KEY='tanjung.integration.v2';
+const STORAGE_KEY='tanjung.integration.v3';
 const defaults={
   ws:{station:'BS.WS',parameter:'Gross Inlet',value:4500,unit:'BFPD',source:'Manual'},
   v:{station:'BS.V',parameter:'Gross Inlet',value:6200,unit:'BFPD',source:'Manual'},
@@ -14,27 +14,79 @@ const defaults={
   wc:{station:'SPU MNGL',parameter:'Water Cut',value:88,unit:'%',source:'Manual'},
   injEff:{station:'WIP',parameter:'Injection Efficiency',value:99,unit:'%',source:'Calculated'}
 };
+
 const equipmentPages=[
-  ['BS.WS','Warukin Selatan','detail_bs_ws.html'],
-  ['BS.V','Block Station V','detail_bs_v.html'],
-  ['BS.IV','Block Station IV','detail_bs_iv.html'],
-  ['BS.III','Block Station III','detail_bs_iii.html'],
-  ['BS.VI','Block Station VI','detail_bs_vi.html'],
-  ['BS.II','Block Station II','detail_bs_ii.html'],
-  ['BS.I','Block Station I','detail_bs_i.html'],
-  ['SPU','SPU MNGL','detail_spu.html'],
-  ['WTIP','Water Treatment Injection Plant','detail_wtip.html'],
-  ['WIP','Water Injection Plant','detail_wip.html'],
-  ['WTP','Water Treatment Plant','detail_wtp.html']
+  ['BS.WS','Warukin Selatan','detail_bs_ws.html','bs_ws'],
+  ['BS.V','Block Station V','detail_bs_v.html','bs_v'],
+  ['BS.IV','Block Station IV','detail_bs_iv.html','bs_iv'],
+  ['BS.III','Block Station III','detail_bs_iii.html','bs_iii'],
+  ['BS.VI','Block Station VI','detail_bs_vi.html','bs_vi'],
+  ['BS.II','Block Station II','detail_bs_ii.html','bs_ii'],
+  ['BS.I','Block Station I','detail_bs_i.html','bs_i'],
+  ['SPU','SPU MNGL','detail_spu.html','spu'],
+  ['WTIP','Water Treatment Injection Plant','detail_wtip.html','wtip'],
+  ['WIP','Water Injection Plant','detail_wip.html','wip'],
+  ['WTP','Water Treatment Plant','detail_wtp.html','wtp']
 ];
-let integration=loadIntegration();let isSystemOn=false;
+
+let integration=loadIntegration();
+let docLinks=loadDocLinks();
+let isSystemOn=false;
+
 function loadIntegration(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));return x?mergeDefaults(x):structuredClone(defaults)}catch(e){return structuredClone(defaults)}}
 function mergeDefaults(saved){const out=structuredClone(defaults);Object.keys(out).forEach(k=>{if(saved[k])out[k]={...out[k],...saved[k]}});return out}
+function loadDocLinks(){try{return JSON.parse(localStorage.getItem('tanjung.doclinks.v1'))||{}}catch(e){return {}}}
+
 function nowLabel(){return new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'}).format(new Date())}
-function renderIntegrationRows(){const body=document.getElementById('integrationRows');body.innerHTML='';Object.entries(integration).forEach(([key,row])=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="station-cell">${row.station}</td><td class="param-cell">${row.parameter}</td><td><input class="value-input" type="number" step="0.1" data-key="${key}" value="${row.value}"></td><td><span class="unit-chip">${row.unit}</span></td><td><select class="select-source" data-source-key="${key}"><option>Manual</option><option>SCADA</option><option>Historian</option><option>Calculated</option></select></td><td class="updated-cell">${row.updated||'—'}</td>`;body.appendChild(tr);tr.querySelector('select').value=row.source||'Manual'})}
-function renderEquipmentLinks(){document.getElementById('equipmentLinks').innerHTML=equipmentPages.map(([code,name,url])=>`<a class="equipment-link" href="${url}" target="_blank"><span><b>${code}</b><small>${name}</small></span><span class="arrow">›</span></a>`).join('')}
-function collectInputs(){document.querySelectorAll('[data-key]').forEach(el=>{const k=el.dataset.key;const n=Number(el.value);if(Number.isFinite(n))integration[k].value=n});document.querySelectorAll('[data-source-key]').forEach(el=>integration[el.dataset.sourceKey].source=el.value);Object.values(integration).forEach(r=>r.updated=nowLabel());localStorage.setItem(STORAGE_KEY,JSON.stringify(integration));renderIntegrationRows();updateDashboard();toast('Data integrasi berhasil diterapkan.')}
-function resetIntegration(){integration=structuredClone(defaults);localStorage.setItem(STORAGE_KEY,JSON.stringify(integration));renderIntegrationRows();updateDashboard();toast('Data integrasi dikembalikan ke default.')}
+
+function renderIntegrationRows(){
+  const body=document.getElementById('integrationRows');body.innerHTML='';
+  Object.entries(integration).forEach(([key,row])=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="station-cell">${row.station}</td><td class="param-cell">${row.parameter}</td><td><input class="value-input" type="number" step="0.1" data-key="${key}" value="${row.value}"></td><td><span class="unit-chip">${row.unit}</span></td><td><select class="select-source" data-source-key="${key}"><option>Manual</option><option>SCADA</option><option>Historian</option><option>Calculated</option></select></td><td class="updated-cell">${row.updated||'—'}</td>`;
+    body.appendChild(tr);tr.querySelector('select').value=row.source||'Manual';
+  })
+}
+
+function renderEquipmentLinks(){
+  const container=document.getElementById('equipmentLinks');
+  container.innerHTML=equipmentPages.map(([code,name,url,key])=>{
+    const savedLink=docLinks[key]||'';
+    return `<div class="equipment-item-card" style="background:#0b1929;border:1px solid #1d314a;border-radius:11px;padding:10px 12px;margin-bottom:9px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <a class="equipment-link" href="${url}" target="_blank" style="text-decoration:none;color:#dce8f8;flex:1;"><span><b>${code}</b><small>${name}</small></span><span class="arrow">›</span></a>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:6px;border-top:1px solid #162942;padding-top:6px;">
+        <input type="url" class="value-input doc-input" data-dockey="${key}" placeholder="Paste Link GDrive / P&ID..." value="${savedLink}" style="font-size:11px;padding:5px 8px;">
+        <button class="btn btn-primary" onclick="saveDocLink('${key}')" style="padding:5px 10px;font-size:10px;">Simpan</button>
+        ${savedLink ? `<a href="${savedLink}" target="_blank" class="btn btn-success" style="padding:5px 8px;font-size:10px;text-decoration:none;">Buka</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveDocLink(key){
+  const input=document.querySelector(`[data-dockey="${key}"]`);
+  if(input){
+    docLinks[key]=input.value.trim();
+    localStorage.setItem('tanjung.doclinks.v1',JSON.stringify(docLinks));
+    renderEquipmentLinks();
+    toast(`Link referensi ${key.toUpperCase()} berhasil disimpan!`);
+  }
+}
+
+function collectInputs(){
+  document.querySelectorAll('[data-key]').forEach(el=>{const k=el.dataset.key;const n=Number(el.value);if(Number.isFinite(n))integration[k].value=n});
+  document.querySelectorAll('[data-source-key]').forEach(el=>integration[el.dataset.sourceKey].source=el.value);
+  Object.values(integration).forEach(r=>r.updated=nowLabel());
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(integration));renderIntegrationRows();updateDashboard();toast('Data integrasi berhasil diterapkan.');
+}
+
+function resetIntegration(){
+  integration=structuredClone(defaults);localStorage.setItem(STORAGE_KEY,JSON.stringify(integration));
+  renderIntegrationRows();updateDashboard();toast('Data integrasi dikembalikan ke default.');
+}
+
 function fmt(v){return Math.round(v).toLocaleString('id-ID')}
 
 function setTextWithPulse(id, val){
@@ -68,8 +120,10 @@ function updateDashboard(){
   setTextWithPulse('v-wc',isSystemOn?wc.toFixed(1):'0');
   setTextWithPulse('v-wtip',isSystemOn?fmt(wtip):'0');
   setTextWithPulse('v-wip',isSystemOn?fmt(wip):'0');
-  setTextWithPulse('v-well-inj',isSystemOn?fmt(inj):'0');
+  setTextWithPipe('v-well-inj',isSystemOn?fmt(inj):'0');
 }
+
+function setTextWithPipe(id, val){ setTextWithPulse(id, val); }
 
 function toggleSystem(){
   isSystemOn=!isSystemOn;
@@ -90,7 +144,6 @@ function toast(msg){
   window.__toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
-// Simulasi perubahan nilai dinamis secara otomatis setiap 4 detik saat sistem ON
 setInterval(()=>{
   if(!isSystemOn) return;
   ['ws','v','iv','iii','vi','ii','i'].forEach(k=>{

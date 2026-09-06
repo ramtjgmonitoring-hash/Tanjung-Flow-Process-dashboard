@@ -1,6 +1,6 @@
 (function() {
   const page = window.EQUIPMENT_PAGE || { code: 'BS.I', name: 'Block Station I', prefix: 'BSI' };
-  const storageKey = 'tanjung_equip_' + page.code.toLowerCase().replace('.', '_');
+  const storageKey = 'tanjung_equip_' + page.code.toLowerCase().replace('.', '_').replace('-', '_');
 
   let db = loadDb();
 
@@ -63,7 +63,7 @@
     if(rCount) rCount.textContent = running;
     if(sCount) sCount.textContent = standby;
 
-    // Render Tabel Pompa (Kolom Catatan di Kiri, Action di Kanan)
+    // Render Tabel Pompa: Kolom ke-9 = Catatan (Kiri), Kolom ke-10 = Action (Kanan)
     const pumpBody = document.getElementById('pumpBody');
     if(pumpBody) {
       pumpBody.innerHTML = pumps.map((p, idx) => `
@@ -85,7 +85,7 @@
       `).join('');
     }
 
-    // Render Tabel Vessel (Kolom Catatan di Kiri, Action di Kanan)
+    // Render Tabel Vessel: Kolom ke-9 = Catatan (Kiri), Kolom ke-10 = Action (Kanan)
     const vesselBody = document.getElementById('vesselBody');
     if(vesselBody) {
       vesselBody.innerHTML = vessels.map((v, idx) => `

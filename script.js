@@ -1,17 +1,17 @@
 const STORAGE_KEY='tanjung.integration.v3';
 const defaults={
-  ws:{station:'BS.WS',parameter:'Gross Inlet',value:4500,unit:'BFPD',source:'Manual'},
-  v:{station:'BS.V',parameter:'Gross Inlet',value:6200,unit:'BFPD',source:'Manual'},
-  iv:{station:'BS.IV',parameter:'Gross Inlet',value:3100,unit:'BFPD',source:'Manual'},
-  iii:{station:'BS.III',parameter:'Gross Inlet',value:5800,unit:'BFPD',source:'Manual'},
-  vi:{station:'BS.VI',parameter:'Gross Inlet',value:4100,unit:'BFPD',source:'Manual'},
-  ii:{station:'BS.II',parameter:'Gross Inlet',value:3900,unit:'BFPD',source:'Manual'},
-  i:{station:'BS.I',parameter:'Gross Inlet',value:2400,unit:'BFPD',source:'Manual'},
-  wtp:{station:'WTP',parameter:'Water Production',value:15000,unit:'BWPD',source:'Manual'},
+  ws:{station:'BS.WS',parameter:'Gross Inlet',value:350,unit:'BFPD',source:'Manual'},
+  v:{station:'BS.V',parameter:'Gross Inlet',value:6874,unit:'BFPD',source:'Manual'},
+  iv:{station:'BS.IV',parameter:'Gross Inlet',value:13581,unit:'BFPD',source:'Manual'},
+  iii:{station:'BS.III',parameter:'Gross Inlet',value:7750,unit:'BFPD',source:'Manual'},
+  vi:{station:'BS.VI',parameter:'Gross Inlet',value:2874,unit:'BFPD',source:'Manual'},
+  ii:{station:'BS.II',parameter:'Gross Inlet',value:12623,unit:'BFPD',source:'Manual'},
+  i:{station:'BS.I',parameter:'Gross Inlet',value:8700,unit:'BFPD',source:'Manual'},
+  wtp:{station:'WTP',parameter:'Water Production',value:25000,unit:'BWPD',source:'Manual'},
   wtip:{station:'WTIP',parameter:'Water Treatment Injection',value:14500,unit:'BWPD',source:'Manual'},
   wip:{station:'WIP',parameter:'Water Injection Plant',value:14400,unit:'BWPD',source:'Manual'},
   spu_mngl:{station:'SPU MNGL',parameter:'SPU Operation',value:5000,unit:'BFPD',source:'Manual'},
-  wc:{station:'SPU MNGL',parameter:'Water Cut',value:88,unit:'%',source:'Manual'},
+  wc:{station:'SPU MNGL',parameter:'Water Cut',value:96,unit:'%',source:'Manual'},
   injEff:{station:'WIP',parameter:'Injection Efficiency',value:99,unit:'%',source:'Calculated'}
 };
 

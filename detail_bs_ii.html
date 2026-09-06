@@ -13,18 +13,23 @@
       <div class="top-actions"><button class="btn btn-secondary" onclick="resetDb()">Reset Sample</button><a class="btn btn-primary" href="index.html">← Dashboard</a></div>
     </header>
 
-    <!-- PANEL DOKUMEN REFERENSI (GOOGLE DRIVE / P&ID) -->
+    <!-- PANEL MULTIPLE DOKUMEN REFERENSI (P&ID / PFD / GDrive) -->
     <section class="section-card" style="margin-bottom: 20px; background: rgba(13, 26, 43, 0.95); border: 1px solid #22344e; padding: 18px; border-radius: 14px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <div class="eyebrow" style="color: #67e8f9;">DOCUMENT INTEGRATION</div>
-          <h3 style="margin: 3px 0 0; font-size: 16px; color: #fff;">Link Dokumen Referensi (P&ID / PFD / Google Drive)</h3>
-        </div>
-        <div style="display:flex; gap:8px; flex:1; max-width:600px; min-width:280px;">
-          <input type="url" id="docLinkInput" class="value-input" placeholder="Tempel link Google Drive / P&ID di sini..." style="flex:1; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
-          <button class="btn btn-primary" onclick="saveStationDoc()" style="white-space:nowrap;">Simpan Link</button>
-          <a id="openDocBtn" href="#" target="_blank" class="btn btn-success" style="display:none; text-decoration:none; white-space:nowrap;">Buka Dokumen</a>
-        </div>
+      <div style="margin-bottom: 12px;">
+        <div class="eyebrow" style="color: #67e8f9;">DOCUMENT INTEGRATION MANAGER</div>
+        <h3 style="margin: 3px 0 0; font-size: 16px; color: #fff;">Daftar Dokumen Referensi (P&ID / PFD / Google Drive)</h3>
+      </div>
+      
+      <!-- Form Input Tambah Link Baru -->
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 14px;">
+        <input type="text" id="docNameInput" class="value-input" placeholder="Nama Dokumen (Contoh: P&ID Separator BS.II)..." style="flex: 1; min-width: 200px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
+        <input type="url" id="docUrlInput" class="value-input" placeholder="Tempel URL Link (Google Drive / PDF)..." style="flex: 2; min-width: 250px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
+        <button class="btn btn-primary" onclick="addStationDoc()" style="white-space:nowrap;">+ Tambah Link</button>
+      </div>
+
+      <!-- Container List Link yang Telah Ditambahkan -->
+      <div id="docListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+        <!-- Render list via JavaScript -->
       </div>
     </section>
 
@@ -117,29 +122,72 @@
   <script>
     window.EQUIPMENT_PAGE={code:'BS.II',name:'Block Station II',prefix:'BSII'};
     
-    const docKey = 'tanjung_doc_bs_ii';
-    function loadStationDoc() {
-      const saved = localStorage.getItem(docKey);
-      if(saved) {
-        document.getElementById('docLinkInput').value = saved;
-        const btnOpen = document.getElementById('openDocBtn');
-        btnOpen.href = saved;
-        btnOpen.style.display = 'inline-block';
+    const storageKey = 'tanjung_docs_bs_ii';
+
+    function getSavedDocs() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || [];
+      } catch(e) {
+        return [];
       }
     }
-    function saveStationDoc() {
-      const val = document.getElementById('docLinkInput').value.trim();
-      if(val) {
-        localStorage.setItem(docKey, val);
-        loadStationDoc();
-        alert('Link dokumen referensi berhasil disimpan!');
-      } else {
-        localStorage.removeItem(docKey);
-        document.getElementById('openDocBtn').style.display = 'none';
-        alert('Link dikosongkan.');
+
+    function renderDocList() {
+      const docs = getSavedDocs();
+      const container = document.getElementById('docListContainer');
+      if(!container) return;
+
+      if(docs.length === 0) {
+        container.innerHTML = '<div style="color: #8fa3bf; font-size: 12px; font-style: italic; padding: 6px 0;">Belum ada dokumen referensi yang ditambahkan.</div>';
+        return;
+      }
+
+      container.innerHTML = docs.map((doc, index) => `
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #091626; border: 1px solid #21344e; padding: 8px 12px; border-radius: 8px; gap: 10px;">
+          <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+            <strong style="color: #67e8f9; font-size: 12px; display: block; margin-bottom: 2px;">${doc.name}</strong>
+            <a href="${doc.url}" target="_blank" style="color: #93c5fd; font-size: 11px; text-decoration: none; font-family: 'Roboto Mono', monospace;">${doc.url}</a>
+          </div>
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
+            <a href="${doc.url}" target="_blank" class="btn btn-success" style="padding: 4px 10px; font-size: 10px; text-decoration: none;">Buka</a>
+            <button class="btn btn-secondary" onclick="deleteDoc(${index})" style="padding: 4px 10px; font-size: 10px; background: #7f1d1d; border-color: #991b1b; color: #f87171;">Hapus</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addStationDoc() {
+      const nameInput = document.getElementById('docNameInput');
+      const urlInput = document.getElementById('docUrlInput');
+      
+      const name = nameInput.value.trim();
+      const url = urlInput.value.trim();
+
+      if(!name || !url) {
+        alert('Mohon isi Nama Dokumen dan URL Link terlebih dahulu!');
+        return;
+      }
+
+      const docs = getSavedDocs();
+      docs.push({ name, url });
+      localStorage.setItem(storageKey, JSON.stringify(docs));
+
+      nameInput.value = '';
+      urlInput.value = '';
+      renderDocList();
+      alert('Dokumen referensi berhasil ditambahkan!');
+    }
+
+    function deleteDoc(index) {
+      if(confirm('Apakah Anda yakin ingin menghapus link dokumen ini?')) {
+        const docs = getSavedDocs();
+        docs.splice(index, 1);
+        localStorage.setItem(storageKey, JSON.stringify(docs));
+        renderDocList();
       }
     }
-    window.addEventListener('DOMContentLoaded', loadStationDoc);
+
+    window.addEventListener('DOMContentLoaded', renderDocList);
   </script>
   <script src="equipment.js"></script>
 </body>

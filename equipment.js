@@ -56,7 +56,7 @@
     document.getElementById('runningCount').textContent = running;
     document.getElementById('standbyCount').textContent = standby;
 
-    // Render Tabel Pompa dengan kolom Catatan
+    // Render Tabel Pompa (Catatan di SEBELAH KIRI Action)
     const pumpBody = document.getElementById('pumpBody');
     pumpBody.innerHTML = pumps.map((p, idx) => `
       <tr>
@@ -68,15 +68,15 @@
         <td>${p.power}</td>
         <td>${p.material}</td>
         <td><span class="status-chip status-${p.status.toLowerCase()}">${p.status}</span></td>
+        <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${p.note || ''}</textarea></td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="editItem('pumps', ${idx})">Edit</button>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px;" onclick="editItem('pumps', ${idx})">Edit</button><br>
           <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171;" onclick="deleteItem('pumps', ${idx})">Del</button>
         </td>
-        <td><input type="text" class="value-input" value="${p.note || ''}" placeholder="Tambah catatan..." onchange="updateNote('pumps', ${idx}, this.value)" style="font-size:11px; padding:5px 8px; width:140px;"></td>
       </tr>
     `).join('');
 
-    // Render Tabel Vessel dengan kolom Catatan
+    // Render Tabel Vessel (Catatan di SEBELAH KIRI Action)
     const vesselBody = document.getElementById('vesselBody');
     vesselBody.innerHTML = vessels.map((v, idx) => `
       <tr>
@@ -88,11 +88,11 @@
         <td>${v.limit}</td>
         <td>${v.level}</td>
         <td><span class="status-chip status-${v.status.toLowerCase()}">${v.status}</span></td>
+        <td><textarea class="value-input" placeholder="Tulis catatan teknis..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:6px 10px; width:220px; min-height:45px; resize:vertical; background:#091626; border:1px solid #2b4567; color:#eaf2ff; border-radius:6px;">${v.note || ''}</textarea></td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px;" onclick="editItem('vessels', ${idx})">Edit</button>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; margin-bottom:4px;" onclick="editItem('vessels', ${idx})">Edit</button><br>
           <button class="btn btn-secondary" style="padding:4px 8px; font-size:10px; background:#7f1d1d; border-color:#991b1b; color:#f87171;" onclick="deleteItem('vessels', ${idx})">Del</button>
         </td>
-        <td><input type="text" class="value-input" value="${v.note || ''}" placeholder="Tambah catatan..." onchange="updateNote('vessels', ${idx}, this.value)" style="font-size:11px; padding:5px 8px; width:140px;"></td>
       </tr>
     `).join('');
   }
@@ -168,7 +168,7 @@
 
     if (currentCategory === 'pumps') {
       item.head = document.getElementById('f-head').value;
-      item.power = document.getElementById('f-power').value;
+      item.power = document.getElementById('f-power'].value || document.getElementById('f-power').value;
       item.material = document.getElementById('f-material').value;
     } else {
       item.pressure = document.getElementById('f-head').value;

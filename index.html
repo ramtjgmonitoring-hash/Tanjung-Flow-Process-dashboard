@@ -46,50 +46,7 @@
       </article>
     </section>
 
-    <section class="workspace-grid">
-      <article class="panel integration-panel">
-        <div class="panel-heading">
-          <div>
-            <div class="eyebrow">OPERATING DATA LAYER</div>
-            <h2>Data Integrasi / Input Parameter</h2>
-            <p>Nilai operasi yang digunakan dashboard. Data ini dipisahkan dari master spesifikasi equipment.</p>
-          </div>
-          <div class="panel-actions">
-            <button id="resetIntegrationBtn" class="btn btn-secondary">Reset Default</button>
-            <button id="applyIntegrationBtn" class="btn btn-success">Apply Data</button>
-          </div>
-        </div>
-
-        <div class="integration-table-wrap">
-          <table class="integration-table">
-            <thead>
-              <tr>
-                <th>Area / Station</th>
-                <th>Parameter</th>
-                <th>Value</th>
-                <th>Unit</th>
-                <th>Source</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-            <tbody id="integrationRows"></tbody>
-          </table>
-        </div>
-        <div class="integration-note"><strong>Catatan:</strong> nilai pada PFD bersifat read-only. Perubahan data operasi dilakukan dari tabel integrasi ini; spesifikasi pompa/tangki/separator dikelola dari halaman Equipment Database masing-masing station.</div>
-      </article>
-
-      <aside class="panel db-panel">
-        <div class="panel-heading compact">
-          <div>
-            <div class="eyebrow">MASTER DATA LAYER</div>
-            <h2>Equipment Database</h2>
-            <p>Akses spesifikasi teknis per area.</p>
-          </div>
-        </div>
-        <div id="equipmentLinks" class="equipment-link-list"></div>
-      </aside>
-    </section>
-
+    <!-- PFD DI PINDAH KE ATAS -->
     <section class="panel pfd-section">
       <div class="panel-heading pfd-heading">
         <div>
@@ -143,6 +100,51 @@
           <div class="pipe-label" style="top:430px;left:870px;color:#f59e0b">Suspensi (crude 65%, water 35%)</div>
         </div>
       </div>
+    </section>
+
+    <!-- DATA INTEGRASI & EQUIPMENT DATABASE DI BAWAH -->
+    <section class="workspace-grid">
+      <article class="panel integration-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">OPERATING DATA LAYER</div>
+            <h2>Data Integrasi / Input Parameter</h2>
+            <p>Nilai operasi yang digunakan dashboard. Data ini dipisahkan dari master spesifikasi equipment.</p>
+          </div>
+          <div class="panel-actions">
+            <button id="resetIntegrationBtn" class="btn btn-secondary">Reset Default</button>
+            <button id="applyIntegrationBtn" class="btn btn-success">Apply Data</button>
+          </div>
+        </div>
+
+        <div class="integration-table-wrap">
+          <table class="integration-table">
+            <thead>
+              <tr>
+                <th>Area / Station</th>
+                <th>Parameter</th>
+                <th>Value</th>
+                <th>Unit</th>
+                <th>Source</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="integrationRows"></tbody>
+          </table>
+        </div>
+        <div class="integration-note"><strong>Catatan:</strong> nilai pada PFD bersifat read-only. Perubahan data operasi dilakukan dari tabel integrasi ini; spesifikasi pompa/tangki/separator dikelola dari halaman Equipment Database masing-masing station.</div>
+      </article>
+
+      <aside class="panel db-panel">
+        <div class="panel-heading compact">
+          <div>
+            <div class="eyebrow">MASTER DATA LAYER</div>
+            <h2>Equipment Database</h2>
+            <p>Akses spesifikasi teknis per area.</p>
+          </div>
+        </div>
+        <div id="equipmentLinks" class="equipment-link-list"></div>
+      </aside>
     </section>
   </main>
 

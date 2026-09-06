@@ -63,7 +63,7 @@
     if(rCount) rCount.textContent = running;
     if(sCount) sCount.textContent = standby;
 
-    // Render Tabel Pompa (Catatan di kiri, Action tombol Edit/Del di kanan)
+    // Render Tabel Pompa: URUTAN KOLOM PASTI (Catatan di kolom ke-9, Action di kolom ke-10)
     const pumpBody = document.getElementById('pumpBody');
     if(pumpBody) {
       pumpBody.innerHTML = pumps.map((p, idx) => `
@@ -85,7 +85,7 @@
       `).join('');
     }
 
-    // Render Tabel Vessel (Catatan di kiri, Action tombol Edit/Del di kanan)
+    // Render Tabel Vessel: URUTAN KOLOM PASTI (Catatan di kolom ke-9, Action di kolom ke-10)
     const vesselBody = document.getElementById('vesselBody');
     if(vesselBody) {
       vesselBody.innerHTML = vessels.map((v, idx) => `

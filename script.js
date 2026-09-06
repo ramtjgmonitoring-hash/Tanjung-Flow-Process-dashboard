@@ -16,27 +16,24 @@ const defaults={
 };
 
 const equipmentPages=[
-  ['BS.WS','Warukin Selatan','detail_bs_ws.html','bs_ws'],
-  ['BS.V','Block Station V','detail_bs_v.html','bs_v'],
-  ['BS.IV','Block Station IV','detail_bs_iv.html','bs_iv'],
-  ['BS.III','Block Station III','detail_bs_iii.html','bs_iii'],
-  ['BS.VI','Block Station VI','detail_bs_vi.html','bs_vi'],
-  ['BS.II','Block Station II','detail_bs_ii.html','bs_ii'],
-  ['BS.I','Block Station I','detail_bs_i.html','bs_i'],
-  ['SPU','SPU MNGL','detail_spu.html','spu'],
-  ['WTIP','Water Treatment Injection Plant','detail_wtip.html','wtip'],
-  ['WIP','Water Injection Plant','detail_wip.html','wip'],
-  ['WTP','Water Treatment Plant','detail_wtp.html','wtp']
+  ['BS.WS','Warukin Selatan','detail_bs_ws.html'],
+  ['BS.V','Block Station V','detail_bs_v.html'],
+  ['BS.IV','Block Station IV','detail_bs_iv.html'],
+  ['BS.III','Block Station III','detail_bs_iii.html'],
+  ['BS.VI','Block Station VI','detail_bs_vi.html'],
+  ['BS.II','Block Station II','detail_bs_ii.html'],
+  ['BS.I','Block Station I','detail_bs_i.html'],
+  ['SPU','SPU MNGL','detail_spu.html'],
+  ['WTIP','Water Treatment Injection Plant','detail_wtip.html'],
+  ['WIP','Water Injection Plant','detail_wip.html'],
+  ['WTP','Water Treatment Plant','detail_wtp.html']
 ];
 
 let integration=loadIntegration();
-let docLinks=loadDocLinks();
 let isSystemOn=false;
 
 function loadIntegration(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));return x?mergeDefaults(x):structuredClone(defaults)}catch(e){return structuredClone(defaults)}}
 function mergeDefaults(saved){const out=structuredClone(defaults);Object.keys(out).forEach(k=>{if(saved[k])out[k]={...out[k],...saved[k]}});return out}
-function loadDocLinks(){try{return JSON.parse(localStorage.getItem('tanjung.doclinks.v1'))||{}}catch(e){return {}}}
-
 function nowLabel(){return new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'}).format(new Date())}
 
 function renderIntegrationRows(){
@@ -49,30 +46,7 @@ function renderIntegrationRows(){
 }
 
 function renderEquipmentLinks(){
-  const container=document.getElementById('equipmentLinks');
-  container.innerHTML=equipmentPages.map(([code,name,url,key])=>{
-    const savedLink=docLinks[key]||'';
-    return `<div class="equipment-item-card" style="background:#0b1929;border:1px solid #1d314a;border-radius:11px;padding:10px 12px;margin-bottom:9px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <a class="equipment-link" href="${url}" target="_blank" style="text-decoration:none;color:#dce8f8;flex:1;"><span><b>${code}</b><small>${name}</small></span><span class="arrow">›</span></a>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;margin-top:6px;border-top:1px solid #162942;padding-top:6px;">
-        <input type="url" class="value-input doc-input" data-dockey="${key}" placeholder="Paste Link GDrive / P&ID..." value="${savedLink}" style="font-size:11px;padding:5px 8px;">
-        <button class="btn btn-primary" onclick="saveDocLink('${key}')" style="padding:5px 10px;font-size:10px;">Simpan</button>
-        ${savedLink ? `<a href="${savedLink}" target="_blank" class="btn btn-success" style="padding:5px 8px;font-size:10px;text-decoration:none;">Buka</a>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function saveDocLink(key){
-  const input=document.querySelector(`[data-dockey="${key}"]`);
-  if(input){
-    docLinks[key]=input.value.trim();
-    localStorage.setItem('tanjung.doclinks.v1',JSON.stringify(docLinks));
-    renderEquipmentLinks();
-    toast(`Link referensi ${key.toUpperCase()} berhasil disimpan!`);
-  }
+  document.getElementById('equipmentLinks').innerHTML=equipmentPages.map(([code,name,url])=>`<a class="equipment-link" href="${url}" target="_blank"><span><b>${code}</b><small>${name}</small></span><span class="arrow">›</span></a>`).join('');
 }
 
 function collectInputs(){
@@ -120,10 +94,8 @@ function updateDashboard(){
   setTextWithPulse('v-wc',isSystemOn?wc.toFixed(1):'0');
   setTextWithPulse('v-wtip',isSystemOn?fmt(wtip):'0');
   setTextWithPulse('v-wip',isSystemOn?fmt(wip):'0');
-  setTextWithPipe('v-well-inj',isSystemOn?fmt(inj):'0');
+  setTextWithPulse('v-well-inj',isSystemOn?fmt(inj):'0');
 }
-
-function setTextWithPipe(id, val){ setTextWithPulse(id, val); }
 
 function toggleSystem(){
   isSystemOn=!isSystemOn;

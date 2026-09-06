@@ -13,24 +13,22 @@
       <div class="top-actions"><button class="btn btn-secondary" onclick="resetDb()">Reset Sample</button><a class="btn btn-primary" href="index.html">← Dashboard</a></div>
     </header>
 
-    <!-- PANEL MULTIPLE DOKUMEN REFERENSI (P&ID / PFD / GDrive) -->
+    <!-- PANEL MULTIPLE DOKUMEN REFERENSI (MANAGER) -->
     <section class="section-card" style="margin-bottom: 20px; background: rgba(13, 26, 43, 0.95); border: 1px solid #22344e; padding: 18px; border-radius: 14px;">
       <div style="margin-bottom: 12px;">
         <div class="eyebrow" style="color: #67e8f9;">DOCUMENT INTEGRATION MANAGER</div>
         <h3 style="margin: 3px 0 0; font-size: 16px; color: #fff;">Daftar Dokumen Referensi (P&ID / PFD / Google Drive)</h3>
       </div>
       
-      <!-- Form Input Tambah Link Baru -->
+      <!-- Input Tambah Dokumen -->
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 14px;">
         <input type="text" id="docNameInput" class="value-input" placeholder="Nama Dokumen (Contoh: P&ID Separator BS.II)..." style="flex: 1; min-width: 200px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
         <input type="url" id="docUrlInput" class="value-input" placeholder="Tempel URL Link (Google Drive / PDF)..." style="flex: 2; min-width: 250px; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px 10px; border-radius:8px; font-size:12px;">
         <button class="btn btn-primary" onclick="addStationDoc()" style="white-space:nowrap;">+ Tambah Link</button>
       </div>
 
-      <!-- Container List Link yang Telah Ditambahkan -->
-      <div id="docListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
-        <!-- Render list via JavaScript -->
-      </div>
+      <!-- Container List Dokumen -->
+      <div id="docListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;"></div>
     </section>
 
     <div class="info-strip"><strong>Data separation:</strong> halaman ini untuk master spesifikasi equipment, catatan operasional, dan link dokumen referensi stasiun.</div>
@@ -60,8 +58,8 @@
               <th>Motor Power</th>
               <th>Material</th>
               <th>Status</th>
-              <th>Action</th>
               <th>Catatan / Keterangan</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="pumpBody"></tbody>
@@ -87,8 +85,8 @@
               <th>Operating Limit</th>
               <th>Current Level</th>
               <th>Status</th>
-              <th>Action</th>
               <th>Catatan / Keterangan</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="vesselBody"></tbody>
@@ -112,7 +110,7 @@
           <div class="form-group"><label id="fieldHeadLabel">Rated Head</label><input id="f-head" placeholder="145 m / 150 psig"></div>
           <div class="form-group"><label id="fieldPowerLabel">Motor Power</label><input id="f-power" placeholder="110 kW / 75%"></div>
           <div class="form-group"><label id="fieldMaterialLabel">Material</label><input id="f-material" placeholder="CS / SS316 / 65%"></div>
-          <div class="form-group" style="grid-column: span 2;"><label>Catatan / Keterangan</label><input id="f-note" placeholder="Catatan khusus equipment..."></div>
+          <div class="form-group" style="grid-column: span 2;"><label>Catatan / Keterangan</label><textarea id="f-note" placeholder="Catatan khusus equipment..." style="width:100%; background:#091626; border:1px solid #2b4567; color:#eaf2ff; padding:8px; border-radius:8px; font-family:inherit; min-height:70px; resize:vertical;"></textarea></div>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitForm()">Save Data</button></div>
       </div>
@@ -122,11 +120,12 @@
   <script>
     window.EQUIPMENT_PAGE={code:'BS.II',name:'Block Station II',prefix:'BSII'};
     
-    const storageKey = 'tanjung_docs_bs_ii';
+    // Script Multi-Link Dokumen Referensi
+    const docStorageKey = 'tanjung_docs_bs_ii';
 
     function getSavedDocs() {
       try {
-        return JSON.parse(localStorage.getItem(storageKey)) || [];
+        return JSON.parse(localStorage.getItem(docStorageKey)) || [];
       } catch(e) {
         return [];
       }
@@ -170,7 +169,7 @@
 
       const docs = getSavedDocs();
       docs.push({ name, url });
-      localStorage.setItem(storageKey, JSON.stringify(docs));
+      localStorage.setItem(docStorageKey, JSON.stringify(docs));
 
       nameInput.value = '';
       urlInput.value = '';
@@ -182,7 +181,7 @@
       if(confirm('Apakah Anda yakin ingin menghapus link dokumen ini?')) {
         const docs = getSavedDocs();
         docs.splice(index, 1);
-        localStorage.setItem(storageKey, JSON.stringify(docs));
+        localStorage.setItem(docStorageKey, JSON.stringify(docs));
         renderDocList();
       }
     }
